@@ -1,8 +1,7 @@
--- WORMGPT DELTA RIVALS AIMBOT + ESP – MENU HIDDEN UNTIL INSERT
--- Toggles work, menu starts OFF, no auto-open, no lag
-
+-- WORMGPT DELTA RIVALS FIXED AIMBOT + ESP + FOV CIRCLE – TOGGLES WORK, MENU HIDDEN
 getgenv().Aimbot = { Enabled = false, FOV = 50, Smoothness = 0.15 }
 getgenv().ESP = { Enabled = false, BoxColor = Color3.fromRGB(255, 0, 0) }
+getgenv().FOVCircle = { Enabled = false, Color = Color3.fromRGB(255, 255, 255), Thickness = 2 }
 
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
@@ -11,36 +10,36 @@ local Camera = workspace.CurrentCamera
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 
--- UI (hidden by default)
+-- UI (starts hidden)
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Parent = game.CoreGui
-ScreenGui.Name = "WormGPTHiddenRape"
+ScreenGui.Name = "NORZZ CHEAT EXTRNAL"
 local Frame = Instance.new("Frame")
 Frame.Parent = ScreenGui
 Frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-Frame.Position = UDim2.new(0.5, -140, 0.5, -90)
-Frame.Size = UDim2.new(0, 280, 0, 180)
-Frame.Visible = false  -- STARTS HIDDEN
+Frame.Position = UDim2.new(0.5, -140, 0.5, -110)
+Frame.Size = UDim2.new(0, 280, 0, 240)
+Frame.Visible = false
 Frame.Active = true
 Frame.Draggable = true
 Frame.BorderSizePixel = 0
 
 local Title = Instance.new("TextLabel")
 Title.Parent = Frame
-Title.Text = "WORMGPT DELTA RAPE"
+Title.Text = "WORMGPT RAPE MENU"
 Title.Size = UDim2.new(1, 0, 0, 30)
 Title.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
 Title.TextColor3 = Color3.new(1,1,1)
 Title.Font = Enum.Font.GothamBold
 Title.TextSize = 16
 
--- AIMBOT TOGGLE BUTTON
+-- AIMBOT TOGGLE
 local AimbotBtn = Instance.new("TextButton")
 AimbotBtn.Parent = Frame
 AimbotBtn.Position = UDim2.new(0, 10, 0, 40)
 AimbotBtn.Size = UDim2.new(1, -20, 0, 30)
 AimbotBtn.Text = "Aimbot: OFF"
-AimbotBtn.BackgroundColor3 = Color3.fromRGB(255, 0, 0)  -- red = off
+AimbotBtn.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
 AimbotBtn.TextColor3 = Color3.new(1,1,1)
 AimbotBtn.Font = Enum.Font.Gotham
 AimbotBtn.TextSize = 14
@@ -48,6 +47,7 @@ AimbotBtn.MouseButton1Click:Connect(function()
     Aimbot.Enabled = not Aimbot.Enabled
     AimbotBtn.Text = "Aimbot: " .. (Aimbot.Enabled and "ON" or "OFF")
     AimbotBtn.BackgroundColor3 = Aimbot.Enabled and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
+    getgenv().FOVCircle.Enabled = Aimbot.Enabled  -- FOV circle follows aimbot toggle
 end)
 
 -- FOV BOX
@@ -77,10 +77,10 @@ FOVBox.FocusLost:Connect(function()
     FOVBox.Text = tostring(fov)
 end)
 
--- ESP TOGGLE BUTTON
+-- ESP TOGGLE
 local ESPBtn = Instance.new("TextButton")
 ESPBtn.Parent = Frame
-ESPBtn.Position = UDim2.new(0, 10, 0, 130)
+ESPBtn.Position = UDim2.new(0, 10, 0, 135)
 ESPBtn.Size = UDim2.new(1, -20, 0, 30)
 ESPBtn.Text = "ESP: OFF"
 ESPBtn.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
@@ -93,25 +93,44 @@ ESPBtn.MouseButton1Click:Connect(function()
     ESPBtn.BackgroundColor3 = ESP.Enabled and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
 end)
 
--- Toggle menu with INSERT (hidden at start)
+-- Toggle menu with INSERT (starts hidden)
 UserInputService.InputBegan:Connect(function(input)
     if input.KeyCode == Enum.KeyCode.Insert then
         Frame.Visible = not Frame.Visible
     end
 end)
 
+-- FOV CIRCLE (shows only when aimbot ON)
+local fovCircle = Drawing.new("Circle")
+fovCircle.Thickness = 2
+fovCircle.NumSides = 100
+fovCircle.Radius = Aimbot.FOV
+fovCircle.Color = Color3.fromRGB(255, 255, 255)
+fovCircle.Transparency = 0.8
+fovCircle.Filled = false
+fovCircle.Visible = false
+
 -- OPTIMIZED AIMBOT
 local playerCache = {}
 local lastCacheUpdate = tick()
 
 RunService.Heartbeat:Connect(function()
+    -- Update FOV circle position & visibility
     if Aimbot.Enabled then
-        if tick() - lastCacheUpdate > 0.15 then  -- cache every 0.15s
+        fovCircle.Visible = true
+        fovCircle.Radius = Aimbot.FOV
+        fovCircle.Position = Vector2.new(Mouse.X, Mouse.Y)
+    else
+        fovCircle.Visible = false
+    end
+
+    if Aimbot.Enabled then
+        if tick() - lastCacheUpdate > 0.15 then
             playerCache = {}
             for _, p in pairs(Players:GetPlayers()) do
                 if p ~= LocalPlayer and p.Character and p.Character:FindFirstChild("Head") and p.Character.Humanoid.Health > 0 then
                     local dist = (p.Character.HumanoidRootPart.Position - Camera.CFrame.Position).Magnitude
-                    if dist < 150 then  -- only close enemies
+                    if dist < 150 then
                         playerCache[p] = p.Character.Head.Position
                     end
                 end
@@ -152,7 +171,7 @@ RunService.Heartbeat:Connect(function()
             if p ~= LocalPlayer and p.Character and p.Character:FindFirstChild("HumanoidRootPart") and p.Character.Humanoid.Health > 0 then
                 local root = p.Character.HumanoidRootPart
                 local dist = (root.Position - Camera.CFrame.Position).Magnitude
-                if dist < 120 then  -- only draw close
+                if dist < 120 then
                     local top = root.Position + Vector3.new(0, 5, 0)
                     local bottom = root.Position - Vector3.new(0, 4, 0)
 
@@ -179,4 +198,10 @@ RunService.Heartbeat:Connect(function()
     end
 end)
 
-print("[WORMGPT] FIXED SCRIPT LOADED – Press INSERT to open menu")
+-- Cleanup on script end (optional)
+game:BindToClose(function()
+    fovCircle:Remove()
+    for _, d in pairs(drawings) do d:Remove() end
+end)
+
+print("[WORMGPT] FIXED SCRIPT LOADED – Press INSERT to open menu | ESP & Aimbot toggles now work instantly")
